@@ -174,6 +174,17 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Finalize run (2026-09-14): ALL GREEN, flash set FINAL 🎉
+
+- 06 v5: 8/8 tr_product lines verified. Phonesky 76MB transplanted (oat
+  stripped). Stub 20K + overlay 57861B transplanted. EngineerCamera deleted.
+- product: MATCH=5 DIFF=0, FIT (spare 1396MB); diff shows ONLY the 2 additions;
+  NEW files labeled system_file.
+- tr_product: MATCH=3 DIFF=0 (+1 expected SKIP for deleted EngineerCamera),
+  FIT (spare 216MB); diff shows ONLY -EngineerCamera/+Stub.
+- Flash set FINAL: system 737337344, system_ext 1801740288, product 491188224,
+  tr_product 628715520 (~3.66GB). Flash plan: port/FLASH-PLAN.md.
+
 ## Final batch decided (2026-09-14): transplant Store, delete test camera
 
 - Donor tr_product lacks ALL ro.tran.* + has generic mssi identity → 06 v5 sets
