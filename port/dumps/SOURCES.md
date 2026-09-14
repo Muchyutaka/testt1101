@@ -214,13 +214,15 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
   '-', presence-only rows (drm/health/nn/bt-aidl) misverdict, media.c2 '?'
   format row, matrix.5 parses 0 HALs (fqname style).
 - DSU track: all4 (system+system_ext+vendor+product) installed with SUCCESS, no
-  error; Sideloader showed "reboot". User TAPPED reboot -> fell back to stock
-  (attempted, failed). Mechanism proven on this device (user's prior vendor-zip
-  DSUs booted) -> OUR trial system died in early boot. Then uninstalled to save
-  space; imgs still on phone. mkfs flags vanilla (-zlz4hc, no -E) -> EROFS
-  compat likely fine. Suspects: tiny userdata (first-boot ENOSPC?) > early
-  init/mount > framework. Awaiting: pstore tail (BEFORE any new reboot!),
-  screen behavior, userdata size set.
+  error; Sideloader showed "reboot". User TAPPED reboot -> INSTANT-STOCK (plain
+  normal reboot, handoff never happened -> NOT a boot crash, install likely
+  hollow). "userdata 32gb" claimed?! (impossible: super total is 9GB ->
+  misunderstanding; clarifying). mkfs flags vanilla (-zlz4hc, no -E) -> EROFS
+  compat likely fine. Awaiting: pstore tail + `gsi_tool status` (asked, not yet
+  pasted) + what "32gb" means. Next-attempt protocol: verify install took
+  (gsi_tool status + /dev/block/mapper/dsu*) BEFORE tapping reboot. Fit: all4
+  ~3.8GB pre-userdata vs ~3.4-4.4GB free -> retry needs drop-vendor (-930MB,
+  zero functional change, it's a copy) or tiny userdata.
 
 ## Final audit requested (2026-09-14): full stock-vs-donor cross-check
 
