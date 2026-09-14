@@ -174,6 +174,33 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Rebuild-all run 2 (2026-09-14): 2/4 built, silent death #2, FIT CRISIS found
+
+- Built: system 737337344 (donor 967544832, -24% via lz4hc!), system_ext
+  1801740288 (donor 1877917696, -4%). Both structurally identical (modulo
+  root-only dirs the user-find couldn't read — now sudo) + prop MATCH each.
+- Script died SILENTLY right after system_ext's prop MATCH (no tripwire then,
+  cause unpinned; every suspect hardened + ERR trap added; re-run reuses the
+  2 good images and re-verifies all 4).
+- ONLY donor-super.raw exists (13.3GB, 16 _a partitions, all _b empty:
+  single-slot usage). Donor geometry proves EXACT-FIT (partition size == img
+  size: 922.7/434.7/1790.9/720.3MB) → stock partitions ≈ stock img sizes.
+- FIT CRISIS (exact-fit assumption): system 703MB ≤ stock ~977MB ✓;
+  product ~440MB ≤ stock ~1865MB ✓; BUT system_ext 1719MB vs stock ~1176MB
+  (OVER ~543MB!) and tr_product ~720MB vs stock ~0.02MB (CATASTROPHIC).
+  Total overflow ~1.26GB vs spare ~1.68GB elsewhere → repacking exists.
+- Plan: (1) lpdump stock super in OrangeFox (partition sizes + FREE SPACE) +
+  pull stock tr_product_a (size confirm); (2) du-breakdown slimming recon
+  (folded into rebuild-all step 4). If super free ≥ ~1.5GB → RESIZE
+  system_ext_a + tr_product_a via fastbootd delete/create (clean, no path
+  hacks). Else → slim system_ext bloat and/or merge tr_product→product
+  (vconfig + ro.product.tr_product.* path risks to analyze).
+- tr_product has ZERO fc entries anywhere → expect (none) labels both sides
+  (MATCH) unless Transsion labels them some other way (build-4 will show).
+- Tool lesson: parallel edit_file calls to the SAME file race (only one
+  persists, results mislabeled) — same-file edits must be sequential or a
+  full rewrite.
+
 ## Rebuild-all run 1 (2026-09-14): died at step 0d, nothing built
 
 - Root cause (closes the whole bug class): `SUPER="$(ls … | grep -i stock | head -1)"`
