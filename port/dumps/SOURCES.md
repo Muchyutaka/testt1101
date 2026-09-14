@@ -174,6 +174,14 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Final audit requested (2026-09-14): full stock-vs-donor cross-check
+
+- step-final-audit.sh: extracts donor vendor + faces off vendor build.props, HAL
+  manifests (vendor-vs-vendor AND framework-requires-vs-vendor-provides via
+  python xml join), linker/VNDK, insmod refs, APEX lists, hardware features
+  (comm), BOOTCLASSPATH closing hunt, donor vendor shape. Read-only, ~8 min,
+  parallel-safe with the DSU test. Awaiting ~/audit.txt.
+
 ## Static risks retired (2026-09-14): sepolicy mapping + HAL versions
 
 - Donor system ships 29.0–34.0 + 202404/202504 sepolicy mappings incl. 31.0.cil
