@@ -78,7 +78,15 @@ Full folders copied via USB (not just the shortlist — fine, more is better):
 - Stock → `~/hios-port/stock/Tecno-MegaPad-11-T1101-27/`
 - Donor → `~/hios-port/donor/R2-Tecno-Megapad-2-T1103/`
 - UNIDENTIFIED (user-made?): `stock/.../super_raw.img` + `stock/.../unpacked_img/`
-  → identify with `file` + `ls` before trusting them; do not build from them until verified.
+  → SOLVED 2026-09-14: `super_raw.img` (9.0G, `file`=data) is the T1101 super
+  converted to raw (2359296×4096 = 9663680256 bytes — exact match, reuse it,
+  do NOT reconvert). `unpacked_img/` is empty — ignore.
+- Laptop: 3.7G RAM + 14G swap (8G added by 00-deps), disk 197G with only **13G free (94%)**.
+  T1103 sparse expands to 3255765×4096 = 13335633152 (12.4 GiB) raw → full
+  laptop-side donor conversion needs ≥25G free. Cleanup or phone-side (DNA)
+  extraction required — see scripts' disk guards.
+- Debian apt has no lpdump/lpunpack/lpmake (only sparse tools via
+  android-sdk-libsparse-utils) → scripts use `unsuper` (pip) instead.
 
 ## Notes for the port
 

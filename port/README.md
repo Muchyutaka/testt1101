@@ -73,11 +73,11 @@ T1101 super (rebuilt, same size/group as stock)
 
 Steps:
 
-1. Dump both supers: `lpdump super_t1101.img > lpdump-t1101.txt` and same for
-   T1103 (script: `port/scripts/01-inspect-super.sh`). Compare group sizes,
-   partition sizes, and `tr_*` presence.
+1. Dump both supers (`unsuper super.img --list`, script: `port/scripts/01-inspect-super.sh` —
+   Debian apt has no lpdump, so `unsuper` from pip is our lister/extractor).
+   Compare group sizes, partition sizes, and `tr_*` presence.
 2. Unpack **one partition at a time** (never the whole super on 4 GB RAM):
-   `lpunpack --partition=system_a super_t1103.img system_t1103.img`.
+   `unsuper super_t1103.img work/ -p system_a -j2` (script: `02-unpack-one.sh`).
 3. Rebuild with `lpmake` using **T1101's** `BOARD_SUPER_PARTITION_SIZE`,
    group `main`, and slot suffixes — only swapping the 3 image files
    (script: `port/scripts/05-minimal-port.sh`).
