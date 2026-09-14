@@ -190,6 +190,33 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
   (both empty — features live in VENDOR). Fixed in step-final-audit2.sh
   (fragments+format, FCM requires-vs-provides, vendor features, agares decl).
 
+## Final audit run 2 (2026-09-14): STATIC AUDIT GREEN + CLOSED 🎉
+
+- Fragments parsed (100 donor / 83 stock HALs): pattern = donor-AIDL vs
+  stock-HIDL across the board. Applicable FCM is LEVEL 6 (both vendors frozen
+  at v31): stock satisfies ALL its HIDL requirements (audio 7.0, radio 1.2/1.3,
+  wifi 1.5/supplicant 1.4, camera 2.6, sensors 2.0, c2 1.1, omx 1.0,
+  tetheroffload, thermal 2.0, allocator/mapper 4.0, composer 2.1/2.3...) except
+  boot 1.0 vs required 1.2 (cosmetic, non-blocking). Donor's OWN shipped matrix
+  demands HIDL from v31 vendors → A16 framework MUST still speak HIDL;
+  radio/wifi/audio/camera/sensors fallback now EXPECTED, not hoped.
+- Same-AIDL both sides: vibrator 2, power (donor 6/stock 2), memtrack,
+  secureclock, sharedsecret (unversioned). Stock also has KeyMint AIDL
+  (unversioned) + NN shim; drm = stock HIDL 1.4 clearkey+widevine.
+- Features: donor-only = face unlock + telephony ext
+  (calling/data/messaging/subscription/radio.access); stock-only =
+  gyro/stepcounter/stepdetector. Face unlock likely N/A (PIN/pattern fine);
+  telephony base present, data decls = post-boot watch item (fixable later via
+  permission XMLs in our vendor copy).
+- agares/BCP: no extra boot jars anywhere → NO framework surgery. Recipe A
+  (donor system+product+system_ext on stock vendor) FINAL.
+- v2 parser gaps (cosmetic only, no re-run needed): AIDL version ranges show
+  '-', presence-only rows (drm/health/nn/bt-aidl) misverdict, media.c2 '?'
+  format row, matrix.5 parses 0 HALs (fqname style).
+- DSU track: user reports reboot falls back to stock Android. Branching:
+  install-didn't-complete vs installed-then-failed-boot (auto-disabled). Owe:
+  combo sent + userdata MB + current DSU Sideloader status.
+
 ## Final audit requested (2026-09-14): full stock-vs-donor cross-check
 
 - step-final-audit.sh: extracts donor vendor + faces off vendor build.props, HAL
