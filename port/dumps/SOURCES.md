@@ -148,9 +148,14 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
   Patch into donor product tree (affects tablet UI: taskbar, embedding).
 - Fingerprints: left generic-on-purpose for first boot (GMS/PI tuning post-boot).
 - TAKE tr_product (720MB Transsion apps, generic build.prop, same mount both sides).
+  CONFIRMED 2026-09-14: it holds CORE GOOGLE APPS (GmsCore, GoogleServicesFramework,
+  Velvet, Chrome64, WebView/Trichrome, LatinImeGoogle, SetupWizard + privapp
+  permission XMLs) + EngineerCamera/SMTLauncher_res/TranfacIcon. Donor splits GMS
+  across product + tr_product; taking both = complete set, no conflicts.
 - SKIP odm for first boot (1043 .so, ~all T1103 camera tuning + T1103 vintf/selinux;
   pending section-D confirm that system doesn't reference /odm).
 - SKIP system_dlkm (donor GKI modules, useless on 5.10 kernel; pending refs check).
+  CONFIRMED generic: bluetooth/can/virtio/usbserial .ko only, no HiOS content.
 - Stock vendor keeps T1101 camera tunings (vendor/lib64) + odm-subdir identity props.
 - Risk noted: stock vendor is VNDK 31 (A12) + composer 2.1 under an SDK-36
   system — Treble-forward-compat will be proven (or disproven) by first boot logs.
