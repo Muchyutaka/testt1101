@@ -174,6 +174,15 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Rebuild test 2 (2026-09-14): METHOD 100% PROVEN 🎉
+
+- Re-run with --mount-point=/product + combined fc + fixed diff line: structure
+  diff EMPTY + ALL 6 samples MATCH (labels+owners+modes). 06 v4 props baked in.
+- step-rebuild-all.sh = final build: same proven flags for all 4 donor partitions
+  (mount-points /, /system_ext, /product, /tr_product), -zlz4hc (same LZ4 wire
+  format the 5.10 kernel already reads, strictly smaller output), per-partition
+  stamp verify + fit check vs stock super geometry. Output: out/*.img flash set.
+
 ## Prop recon + rebuild test 2 (2026-09-14)
 
 - characteristics=tablet lives ONLY in stock product (line 28); donor product had
