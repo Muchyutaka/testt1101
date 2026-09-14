@@ -174,6 +174,20 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Rebuild-all run 1 (2026-09-14): died at step 0d, nothing built
+
+- Root cause (closes the whole bug class): `SUPER="$(ls … | grep -i stock | head -1)"`
+  with no matching super files → ls+grep fail → pipefail → assignment fails →
+  errexit fires. There is NO immunity for failures inside $(…); earlier
+  `VAR=$(…|head)` lines survived only by luck (tiny outputs, no SIGPIPE).
+  Rule: surveys run +o pipefail; build scripts keep pipefail (real mkfs failures
+  must kill) + every may-fail $()/pipeline gets `|| true` or loop form.
+  Full audit of step-rebuild-all.sh done: SUPER→find_super loop, LIST armored,
+  everything else verified safe-or-deliberately-fatal.
+- Also possible: super files exist but lack "stock" in the name, or live outside
+  $BASE. find_super takes any *super* file, prefers *stock*, else graceful
+  fallback (fit check vs original size + raw numbers for human judgment).
+
 ## Rebuild test 2 (2026-09-14): METHOD 100% PROVEN 🎉
 
 - Re-run with --mount-point=/product + combined fc + fixed diff line: structure

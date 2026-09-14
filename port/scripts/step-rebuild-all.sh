@@ -21,11 +21,22 @@ grep -rn -E 'ro\.sf\.lcd_density|ro\.build\.characteristics|ro\.product\.type|ro
 log "0c. property_source_order confirm…"
 grep -h 'property_source_order' "$TREES/donor-system/system/build.prop" "$TREES/stock-system/system/build.prop" || true
 log "0d. stock super geometry (partition sizes)…"
-SUPER="$(ls "$BASE"/*super*.img "$BASE"/work/*super*.img 2>/dev/null | grep -i stock | head -1)"
-[[ -z "$SUPER" ]] && SUPER="$(ls "$BASE"/*super*.img "$BASE"/work/*super*.img 2>/dev/null | head -1)"
+find_super() { # any *super* file, prefer *stock*; no pipelines (errexit-safe)
+  local c
+  for c in "$BASE"/*super* "$BASE"/work/*super*; do
+    [[ -f "$c" ]] || continue
+    case "$c" in *stock*) echo "$c"; return 0;; esac
+  done
+  for c in "$BASE"/*super* "$BASE"/work/*super*; do
+    [[ -f "$c" ]] && { echo "$c"; return 0; }
+  done
+  return 1
+}
+SUPER="$(find_super || true)"
+echo "super candidates:"; ls -l "$BASE"/*super* "$BASE"/work/*super* 2>/dev/null || echo "(no *super* files in $BASE or $BASE/work)"
 echo "super file: ${SUPER:-(none found — fit check falls back to vs-original size)}"
 LIST=""
-if [[ -n "$SUPER" ]]; then LIST="$(unsuper --list "$SUPER" 2>&1 | head -40)"; echo "$LIST"; fi
+if [[ -n "$SUPER" ]]; then LIST="$(unsuper --list "$SUPER" 2>&1 | head -40 || true)"; echo "$LIST"; fi
 log "1. combined file_contexts…"
 FCS="$(find "$TREES" -name '*file_contexts*' 2>/dev/null | sort)"
 FC2="$OUT/fc-combined.txt"; rm -f "$FC2"; touch "$FC2"
