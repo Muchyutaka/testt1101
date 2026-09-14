@@ -174,6 +174,22 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Final audit run 1 (2026-09-14): donor runs A16-on-v31 too!! + 3 script bugs
+
+- SMOKING GUN: donor vendor first_api_level=31 + donor ships vndk.v31 APEX →
+  Transsion's own HiOS 16 runs on a frozen-v31 vendor. Our architecture
+  (A16 system + v31 vendor) = vendor-certified, not hoped. Forward-compat PROVEN.
+- Radio caveat: donor AIDL radio (v2-5) vs stock HIDL (1.2/1.3) → telephony may
+  need framework fallback (probably works; logs will tell). #1 functional risk.
+- Stock super files exist nested (stock/.../super{,_raw,_empty}.img) — available
+  for any future re-extract. Donor vendor: 1.2G, libCamera 1130 (vs stock 380).
+- insmod: none in donor init ✓. APEX sets consistent (donor-only: scorpio;
+  stock-only: appservices/performance (non-boot HAL deps at worst)).
+- Script bugs (v1): missed manifest/ fragments (core-HAL ONLY-STOCK artifacts),
+  checked framework manifest instead of FCM, features searched wrong paths
+  (both empty — features live in VENDOR). Fixed in step-final-audit2.sh
+  (fragments+format, FCM requires-vs-provides, vendor features, agares decl).
+
 ## Final audit requested (2026-09-14): full stock-vs-donor cross-check
 
 - step-final-audit.sh: extracts donor vendor + faces off vendor build.props, HAL
