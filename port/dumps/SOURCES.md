@@ -87,6 +87,24 @@ Full folders copied via USB (not just the shortlist — fine, more is better):
 - Debian apt has no lpdump/lpunpack/lpmake (only sparse tools via
   android-sdk-libsparse-utils) → scripts use `unsuper` (pip) instead.
 
+## Partition maps (unsuper, 2026-09-14)
+
+T1101 stock (`super_raw.img`, all content on `_a`, `_b` slots empty, total 5154.8MB):
+
+| part | size | part | size |
+|---|---|---|---|
+| system_a | 976.6MB | vendor_a | 930.3MB |
+| system_ext_a | 1175.6MB | vendor_dlkm_a | 35.7MB |
+| product_a | 1864.7MB | odm_dlkm_a | 0.3MB |
+| tr_mi_a | 169.7MB | tr_product/theme/preload/region/company/carrier_a | 0.3MB each |
+
+T1103 donor: `partition_info.json` confirms super size 13335613440 (12.4 GiB),
+groups `main_a/main_b`, extra partitions vs T1101: `odm`, `system_dlkm`,
+`tr_misc`, `tr_manifest`, `tr_overlayfs` (all size-0 in json — real sizes need
+`unsuper --list`, pending). Donor drops T1101's `tr_mi/tr_theme`.
+Gotcha: laptop `/tmp` is 1.9G tmpfs → unsuper sparse staging MUST use
+`--temp-dir` on `/` (scripts now do this automatically).
+
 ## Notes for the port
 
 - Same platform both sides (`MT6789`, MOLY LR13 base) — good sign.

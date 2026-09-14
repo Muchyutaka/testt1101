@@ -33,7 +33,9 @@ if command -v unsuper >/dev/null 2>&1; then
     fi
   fi
   echo; echo "== partitions (unsuper --list) =="
-  unsuper "$IMG" --list 2>&1 | head -60 || true
+  T="$(mktemp -d -p . unsuper-tmp.XXXXXX)"; export TMPDIR="$T"
+  unsuper "$IMG" --list --temp-dir "$T" 2>&1 | head -60 || true
+  rm -rf "$T"
 elif command -v lpdump >/dev/null 2>&1 && (( ! SPARSE )); then
   echo; echo "== lpdump =="; lpdump "$IMG" | head -60 || true
 else

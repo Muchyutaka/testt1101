@@ -24,8 +24,10 @@ if command -v unsuper >/dev/null 2>&1; then
   else
     disk_check "$OUT" 8
   fi
-  log "unsuper $IMG -p ${PART}_${SLOT} (jobs=2 for 4GB RAM)"
-  (cd "$OUT" && unsuper "$IMG" . -p "${PART}_${SLOT}" -j2 -q)
+  T="$OUT/.tmp-unsuper"; mkdir -p "$T"; export TMPDIR="$T"
+  log "unsuper $IMG -p ${PART}_${SLOT} (jobs=2 for 4GB RAM, temp on big disk)"
+  (cd "$OUT" && unsuper "$IMG" . -p "${PART}_${SLOT}" -j2 -q --temp-dir "$T")
+  rm -rf "$T"
   mv "$OUT/${PART}_${SLOT}.img" "$OUT/${PART}_${TAG}.img" 2>/dev/null || {
     ls "$OUT"; die "expected ${PART}_${SLOT}.img not produced — check 'unsuper $IMG --list' for exact names"; }
   ls -l "$OUT/${PART}_${TAG}.img"; file "$OUT/${PART}_${TAG}.img"

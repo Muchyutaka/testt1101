@@ -116,6 +116,10 @@ Steps:
   Plus `echo 10 | sudo tee /proc/sys/vm/swappiness` to prefer RAM but survive spikes.
 - Close the browser while running `lpunpack/lpmake/mkfs.erofs`. They are the
   peak-RAM tools.
+- If `/tmp` is a small tmpfs (`df -h /tmp` shows ~2G), point temp at the big disk:
+  `mkdir -p ~/hios-port/tmp && export TMPDIR=~/hios-port/tmp` (super tools stage
+  12 GB+ temp files; the scripts set `--temp-dir` automatically, but raw `unsuper`
+  calls need it by hand).
 - Work **one partition at a time**, delete/convert intermediates immediately.
 - Prefer streaming/convert-in-place: `simg2img in.simg out.raw` then
   `rm in.simg`; never keep sparse + raw + extracted tree for 2 partitions at once.
