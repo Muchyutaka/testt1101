@@ -1,30 +1,24 @@
 #!/usr/bin/env bash
-# 06-patch-props.sh v2 — donor system-side is GENERIC MSSI (zero T1103 strings
-# outside odm, which we skip), and stock system is generic too. So: no identity
-# replacement; we ADD T1101 specifics: density 280 everywhere + tablet flags.
-# Fingerprints/identity left generic-on-purpose (boot doesn't care; GMS
-# certification tuning is post-boot). Idempotent.
-# Usage: bash 06-patch-props.sh <extracted-tree> [tree-name]
+# 06-patch-props.sh TREE TAG — v3: density 280 in place (all donor trees);
+# donor product also gets ro.build.characteristics=tablet IN PLACE
+# (the exact key init reads; v2 added a useless ro.product.* key instead).
+# Usage: bash port/scripts/06-patch-props.sh <tree> <tag>
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
-ROOT="${1:?usage: 06-patch-props.sh <extracted-tree> [tree-name]}"
-NAME="${2:-$(basename "$ROOT")}"
-DENSITY=280
-set_prop() { # file key value
-  if grep -q "^$2=" "$1"; then sed -i "s|^$2=.*|$2=$3|" "$1"; else printf '%s=%s\n' "$2" "$3" >> "$1"; fi
-}
-while IFS= read -r -d '' BP; do
-  log "--- $BP"
-  if grep -qi 't1103' "$BP"; then
-    sed -i -e 's/T1103/T1101/g' -e 's/t1103/t1101/g' "$BP"
-    log "  T1103→T1101 replaced (unexpected on generic donor — verify!)"
+T="${1:?usage: 06-patch-props.sh TREE TAG}"; TAG="${2:?usage: 06-patch-props.sh TREE TAG}"
+P="$(find "$T" -maxdepth 4 -name build.prop 2>/dev/null | head -1)"
+[[ -n "$P" ]] || die "no build.prop under $T"
+cp -n "$P" "$P.orig" 2>/dev/null || true
+log "--- $P"
+sed -i -E 's/^(ro\.sf\.lcd_density=).*/\1280/' "$P"
+grep -q '^ro\.sf\.lcd_density=' "$P" || echo 'ro.sf.lcd_density=280' >> "$P"
+echo "  ro.sf.lcd_density=280"
+if [[ "$TAG" == "donor-product" ]]; then
+  if grep -q '^ro\.build\.characteristics=' "$P"; then
+    sed -i -E 's/^(ro\.build\.characteristics=).*/\1tablet/' "$P"
+  else
+    echo 'ro.build.characteristics=tablet' >> "$P"
   fi
-  set_prop "$BP" ro.sf.lcd_density "$DENSITY"
-  log "  ro.sf.lcd_density=$DENSITY"
-  if [[ "$BP" == */product/etc/build.prop ]]; then
-    set_prop "$BP" ro.build.characteristics tablet
-    set_prop "$BP" ro.product.type tablet
-    log "  characteristics=tablet, type=tablet"
-  fi
-done < <(find "$ROOT" -maxdepth 4 -name build.prop -print0)
-log "done ($NAME)."
+  echo "  ro.build.characteristics=tablet"
+fi
+log "done ($TAG)."

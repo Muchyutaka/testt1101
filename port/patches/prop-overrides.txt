@@ -1,14 +1,9 @@
-# Canonical prop overrides for donor (T1103) trees — v2.
-# Donor system-side is GENERIC MSSI (no T1103 strings; T1103-ness lived in odm,
-# which the port skips). Stock system is generic too, so identity/fingerprints
-# are LEFT generic-on-purpose. Only T1101 specifics get forced:
-#   every taken build.prop:  ro.sf.lcd_density=280
-#   product/etc/build.prop:  ro.build.characteristics=tablet, ro.product.type=tablet
-# (Applied by scripts/06-patch-props.sh. Fingerprint/GMS tuning is post-boot.)
+# prop-overrides v3 (applied by 06-patch-props.sh, in place, .orig backup kept)
+# Density everywhere; characteristics ONLY in donor product (the key init reads).
+# Fingerprints/identity stay generic for first boot (GMS tuning post-boot).
+
+# all 4 donor build.props (system, system_ext, product, tr_product):
 ro.sf.lcd_density=280
+
+# donor product ONLY:
 ro.build.characteristics=tablet
-ro.product.type=tablet
-# NEVER copy donor values for: vendor.display.*, ro.surface_flinger.*,
-# persist.sys.sf.*, vendor.mtk.*, ro.vendor.mtk_*, ro.hardware.*, ro.crypto.*.
-# Stock T1101 reference: vendor/build.prop (T1101-OP section) has density 280;
-# product/etc/build.prop has characteristics=tablet + TECNO-T1101 identity.

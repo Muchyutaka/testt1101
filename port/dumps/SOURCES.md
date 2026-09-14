@@ -174,6 +174,19 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Rebuild test 1 (2026-09-14): method 80% proven
+
+- Patch: density 280 landed in all 4 donor trees ✓
+- BUT 06 v2 patched the WRONG characteristics key (added useless `ro.product.*`,
+  left real `ro.build.characteristics=default`). 06 v3 fixes in place, product only.
+- Structure: rebuilt image layout byte-identical to original (empty find-diff) ✓
+- Owners/modes: [644 0 0] matched via chown ✓ (test2 uses --force-uid/gid instead)
+- Labels: ALL (none) — cause: donor product_file_contexts is EMPTY (0 lines) and
+  mkfs needs --mount-point=/product so /product* regexps match. Test2 combines ALL
+  trees' fcs + --mount-point + forced ids. mkfs.erofs 1.8.6 supports everything.
+- Script robustness: cmp_one died on absent sample file and leaked 2 loop mounts;
+  test2 adds SKIP-on-missing + EXIT trap + leftover cleanup at start.
+
 ## Refs + stamp verdicts (survey-refs complete, 2026-09-14)
 
 - /odm refs in donor system-side: ONLY generic plumbing (ueventd firmware paths,
