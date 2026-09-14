@@ -71,6 +71,15 @@ init_boot.img  preloader_ufs.img  tr_manifest.map  vendor_dlkm.map
 installed-files-odm.txt  product.map  tr_misc.map  version.csv
 ```
 
+## Laptop copy (Debian, 2026-09-14)
+
+Full folders copied via USB (not just the shortlist — fine, more is better):
+
+- Stock → `~/hios-port/stock/Tecno-MegaPad-11-T1101-27/`
+- Donor → `~/hios-port/donor/R2-Tecno-Megapad-2-T1103/`
+- UNIDENTIFIED (user-made?): `stock/.../super_raw.img` + `stock/.../unpacked_img/`
+  → identify with `file` + `ls` before trusting them; do not build from them until verified.
+
 ## Notes for the port
 
 - Same platform both sides (`MT6789`, MOLY LR13 base) — good sign.
