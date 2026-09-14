@@ -174,6 +174,28 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Rebuild-all run 3 (2026-09-14): ALL 4 BUILT, ALL MATCH, ZERO DIFF 🎉
+
+- system 737337344 FIT(spare 273MB), MATCH=1 (build.prop; no top-level samples
+  in system-as-root, expected)
+- system_ext 1801740288 OVERFLOW(+542MB vs stock), MATCH=5
+- product 447221760 (fresh hc build, SMALLER than donor 455831552!) FIT(spare
+  1438MB!), MATCH=5
+- tr_product 741081088 (fresh, smaller than donor 755306496), MATCH=4 —
+  labels matched (system_file) despite zero tr_product fc entries (default
+  fallback covers it; verified equal, mechanism irrelevant)
+- No silent death (armor + tripwire held; original cause still unpinned but gone).
+- Slimming recon: system_ext = app 1343MB + priv-app 1124MB. Removable candidates:
+  TranssionCamera 138MB (T1103-tuned, needs missing odm drivers), TranAodApk 95MB
+  (AOD useless on T1101 LCD), MediaEditor 89, TranssionNotes 89, SmartPanel 86,
+  AudioLink 78, TWallet 78, PhoneMaster 68, SmartCaller 63 + test apps
+  (EngineerMode/JVFactoryTest/TranfacMode/DebugLoggerUI). Core (keep): AiGallery
+  192, TranSettings 166, TranSystemUI 59, TranssionLauncher, TranSettings*.
+  tr_product: EngineerCamera 245MB removable (test app); rest is core GMS.
+- Decision: tr_product FORCES resize-or-merge regardless (706MB vs 0.02MB slot);
+  resizing system_ext (+550MB) at the same time is no extra risk → RESIZE BOTH
+  (pending lpdump: super free ≥ ~1.4GB). Slim list kept as fallback.
+
 ## Rebuild-all run 2 (2026-09-14): 2/4 built, silent death #2, FIT CRISIS found
 
 - Built: system 737337344 (donor 967544832, -24% via lz4hc!), system_ext
