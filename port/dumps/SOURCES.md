@@ -213,17 +213,23 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - v2 parser gaps (cosmetic only, no re-run needed): AIDL version ranges show
   '-', presence-only rows (drm/health/nn/bt-aidl) misverdict, media.c2 '?'
   format row, matrix.5 parses 0 HALs (fqname style).
-- DSU track: all4 (system+system_ext+vendor+product) installed with SUCCESS, no
-  error; Sideloader showed "reboot". User TAPPED reboot -> INSTANT-STOCK (plain
-  normal reboot, handoff never happened -> NOT a boot crash, install hollow).
-  ROOT CAUSE FOUND: user typed userdata = 32GB (impossible: super total 9GB,
-  free ~3.4GB) -> gsid could not create it -> hollow "success" -> reboot went
-  to stock because NO trial existed. Pstore stood down (nothing crashed, no
-  crash log to find). Retry recipe: cancel snapshots (free COW space) ->
-  sys+ext+prod WITHOUT vendor (all4=3821MB pre-userdata leaves ~0; vendor is a
-  byte-copy, adds nothing) -> userdata as big as fits (aim >=1GB) -> VERIFY
-  (gsi_tool status + ls /dev/block/mapper | grep dsu) BEFORE tapping reboot.
-  Awaiting: baseline `gsi_tool status` + retry verify outputs + screen report.
+- DSU track: pstore PROVES a DSU boot was attempted (vbmeta-disabled line) and
+  panicked at 2.1s: init failed to mount REQUIRED /product -> kernel panic ->
+  reboot -> stock ("instant-stock" = panic+reboot, user misperceived single
+  boot). `gsi_tool status`=normal (clean slate now). User RIGHT that userdata
+  wasn't the direct cause (apology owed + given); real cause = dsu_product
+  EMPTY/CORRUPT: stock first-stage fstab is EROFS-only for product/system_ext/
+  vendor (dual erofs+ext4 only for system) yet log shows ext4 attempt failing
+  with invalid-sb too -> content was NEITHER -> product image never written.
+  Airtight math: all4 = 3821MB > ~3413MB free (snapshots never cancelled) ->
+  product write starved. Mystery: ext4 line for /product implies booted
+  vendor_boot may be patched (dual fstab) OR pstore is old -> dating pstore +
+  checking stock-vendor fstab + live /proc/mounts. Our EROFS system/ext/vendor
+  mount status unknown (need fuller pstore: did /system /system_ext mount OK?).
+  RETRY: cancel snapshots -> sys+ext + ~1GB userdata (recommended; stock EROFS
+  product_a stays, proven mountable since stock boots) OR sys+ext+prod + 500MB
+  -> verify status+mapper BEFORE reboot. Awaiting: pstore date + fuller mount
+  log + mounts + stock fstab grep.
 
 ## Final audit requested (2026-09-14): full stock-vs-donor cross-check
 
