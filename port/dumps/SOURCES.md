@@ -81,10 +81,9 @@ Full folders copied via USB (not just the shortlist — fine, more is better):
   → SOLVED 2026-09-14: `super_raw.img` (9.0G, `file`=data) is the T1101 super
   converted to raw (2359296×4096 = 9663680256 bytes — exact match, reuse it,
   do NOT reconvert). `unpacked_img/` is empty — ignore.
-- Laptop: 3.7G RAM + 14G swap (8G added by 00-deps), disk 197G with only **13G free (94%)**.
-  T1103 sparse expands to 3255765×4096 = 13335633152 (12.4 GiB) raw → full
-  laptop-side donor conversion needs ≥25G free. Cleanup or phone-side (DNA)
-  extraction required — see scripts' disk guards.
+- Laptop: 3.7G RAM + 14G swap (8G added by 00-deps), disk 197G.
+  Was 13G free (94%) → user freed to **98G free (48%)** on 2026-09-14.
+  Full laptop-side workflow now possible (donor raw 12.4G + extracts + rebuild fit).
 - Debian apt has no lpdump/lpunpack/lpmake (only sparse tools via
   android-sdk-libsparse-utils) → scripts use `unsuper` (pip) instead.
 
