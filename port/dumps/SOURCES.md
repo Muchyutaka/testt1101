@@ -213,9 +213,10 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - v2 parser gaps (cosmetic only, no re-run needed): AIDL version ranges show
   '-', presence-only rows (drm/health/nn/bt-aidl) misverdict, media.c2 '?'
   format row, matrix.5 parses 0 HALs (fqname style).
-- DSU track: user reports reboot falls back to stock Android. Branching:
-  install-didn't-complete vs installed-then-failed-boot (auto-disabled). Owe:
-  combo sent + userdata MB + current DSU Sideloader status.
+- DSU track: all4 (system+system_ext+vendor+product) installed with SUCCESS, no
+  error; Sideloader showed "reboot". User then UNINSTALLED (to save space) ->
+  boots to stock is EXPECTED (no DSU present), not a failure signal. NO boot
+  verdict yet. Open: was a DSU boot ever attempted? are imgs still on phone?
 
 ## Final audit requested (2026-09-14): full stock-vs-donor cross-check
 
