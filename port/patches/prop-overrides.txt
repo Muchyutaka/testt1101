@@ -1,9 +1,15 @@
-# prop-overrides v3 (applied by 06-patch-props.sh, in place, .orig backup kept)
-# Density everywhere; characteristics ONLY in donor product (the key init reads).
-# Fingerprints/identity stay generic for first boot (GMS tuning post-boot).
+# prop-overrides v4 FINAL (applied by 06-patch-props.sh; backups in work/prop-orig/)
+# Source: prop recon 2026-09-14 (stock product vs donor product build.props).
 
-# all 4 donor build.props (system, system_ext, product, tr_product):
+# all 4 donor build.props (system, system_ext, product, tr_product), in place:
 ro.sf.lcd_density=280
 
-# donor product ONLY:
+# donor product ONLY (keys stock has, donor lacks — in place or appended):
 ro.build.characteristics=tablet
+ro.product.type=tablet
+ro.build.display.id=T1101-M1101ABCD-U-BASE-260410V1133
+
+# Deliberately untouched: fingerprints, device/model/brand (vendor pins T1101
+# via source order), ro.build.type=user (same both sides), everything in tr_product
+# except density (tr_product is not in donor property_source_order, so its
+# ro.build.* never become global and its ro.product.* stay namespaced).

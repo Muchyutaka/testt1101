@@ -174,6 +174,25 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Prop recon + rebuild test 2 (2026-09-14)
+
+- characteristics=tablet lives ONLY in stock product (line 28); donor product had
+  `default` → patched in place (verified line 27). Vendor (both sides) defines none
+  → product's value wins the global. ✓
+- `ro.product.type=tablet` is REAL (stock product line 135, Transsion key), donor
+  lacks it → 06 v4 appends it to donor product (v3 wrongly dropped it).
+- display.id: stock product = T1101-...V1133; donor product lacks it; donor system
+  has generic BP2A. Stock/donor vendor lack it → donor product gets stock's V1133 id
+  (cosmetic About-page fix, zero boot risk).
+- ro.build.type=user on both systems ✓. tr_product/system_ext/odm/vendor/… define
+  none of these keys → nothing to do there (also tr_product isn't in donor's
+  property_source_order, so its ro.build.* could never go global anyway).
+- Test2 mechanics: combined fc = 2996 lines with /(product|system/product) entries
+  present; leftover mounts cleaned; MATCH/DIFF verdict was CUT from paste —
+  awaiting `sed -n '/structure diff/,$p' ~/rebuild-test2.txt`.
+- Lesson: 06 v3's in-tree `build.prop.orig` got PACKED into the image (+1 inode).
+  v4 keeps backups in work/prop-orig/; rebuild-all deletes stray *.orig first.
+
 ## Rebuild test 1 (2026-09-14): method 80% proven
 
 - Patch: density 280 landed in all 4 donor trees ✓
