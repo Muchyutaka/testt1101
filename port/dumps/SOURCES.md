@@ -174,6 +174,15 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Static risks retired (2026-09-14): sepolicy mapping + HAL versions
+
+- Donor system ships 29.0–34.0 + 202404/202504 sepolicy mappings incl. 31.0.cil
+  → stock v31 vendor policy loads on A16. Biggest forward-compat risk GONE.
+- Stock HALs: audio 7.0, composer 2.1, mapper/allocator 4.0, sensors 2.0,
+  bluetooth 1.1, radio 1.2/1.3 + mtk/transsion extras — all within A16's
+  supported ranges (GSI precedent). Possible post-boot papercuts: thermal 1.0,
+  media.omx 1.0 (non-boot-blocking). Nothing left to verify statically → boot it.
+
 ## DSU test detour (2026-09-14): user trials via DSU Sideloader before flashing
 
 - No custom vendor needed (stock vendor stays by design; DSU keeps it automatically).
