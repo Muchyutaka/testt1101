@@ -160,6 +160,20 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Risk noted: stock vendor is VNDK 31 (A12) + composer 2.1 under an SDK-36
   system — Treble-forward-compat will be proven (or disproven) by first boot logs.
 
+## Stock device ground truth (adb getprop, booted T1101 on V1046, 2026-09-14)
+
+- `ro.sf.lcd_density=280` ✓ (vendor T1101-OP section wins over hal 480 → LAST-wins;
+  patch 280 into every taken tree so order is irrelevant)
+- `ro.product.device=TECNO-T1101`, model `TECNO T1101`, brand `TECNO` ✓
+- `ro.build.characteristics=tablet` ✓ (patch into donor product confirmed)
+- `ro.build.fingerprint=TECNO/T1101-OP/TECNO-T1101:14/UP1A.231005.007/260410V1046`
+  (matches recovery tree; firmware files are a newer V1133/V971/V931 mix — harmless)
+- `ro.product.tr_product.device=TECNO-T1101` (stock tr_product carries identity;
+  donor tr_product is generic — final device still T1101 via vendor, 2nd in donor order)
+- adb works (device `137751556B000732`) — log collection path ready.
+- Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
+  Survey scripts now run with `set +o pipefail`.
+
 ## Notes for the port
 
 - Same platform both sides (`MT6789`, MOLY LR13 base) — good sign.

@@ -5,6 +5,7 @@
 # Usage: bash port/scripts/step-survey-deep.sh
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
+set +o pipefail  # surveys preview long lists with | head: SIGPIPE must not kill the script
 BASE="${BASE:-$HOME/hios-port}"
 WORK="$BASE/work"; TREES="$BASE/trees"
 [[ -d "$TREES/donor-system" ]] || die "trees missing — run step-extract-and-survey.sh first"

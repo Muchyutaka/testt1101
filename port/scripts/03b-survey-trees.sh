@@ -4,6 +4,7 @@
 # Usage: bash 03b-survey-trees.sh <trees-dir>
 set -euo pipefail
 . "$(dirname "$0")/lib.sh"
+set +o pipefail  # surveys preview long lists with | head: SIGPIPE must not kill the script
 T="${1:?usage: 03b-survey-trees.sh <trees-dir>}"
 OUTD="$(dirname "$T")"
 echo "=== tree sizes + top level ==="
