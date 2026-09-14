@@ -134,6 +134,27 @@ set incl. tr_mi/tr_theme). Only open question: add an `odm` entry + partition
 specific?). system_dlkm: skip unless userspace references found. tr_manifest/
 tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed mounts).
 
+## Build.prop + partition verdicts (deep survey, 2026-09-14)
+
+- Donor system/product/system_ext/tr_product/system_dlkm build.props are 100%
+  GENERIC MSSI (`mssi_64_64only_cn_armv82`/`tssi`, zero T1103 strings). All
+  T1103-ness lived in donor odm (device props, camera tunings, vintf, selinux).
+- Stock system is generic too (`FULL-64-ARMV82`); T1101 identity comes from
+  stock product/system_ext/vendor(+vendor/odm subdir). So: NO identity
+  replacement needed — patch = ADD density 280 + tablet flags only.
+- Density: donor 360 (odm) vs stock 280 (vendor T1101-OP section; hal section
+  says 480 — device getprop will confirm 280). Patch 280 into every taken tree.
+- characteristics: donor product `default` vs stock `tablet` (+`ro.product.type=tablet`).
+  Patch into donor product tree (affects tablet UI: taskbar, embedding).
+- Fingerprints: left generic-on-purpose for first boot (GMS/PI tuning post-boot).
+- TAKE tr_product (720MB Transsion apps, generic build.prop, same mount both sides).
+- SKIP odm for first boot (1043 .so, ~all T1103 camera tuning + T1103 vintf/selinux;
+  pending section-D confirm that system doesn't reference /odm).
+- SKIP system_dlkm (donor GKI modules, useless on 5.10 kernel; pending refs check).
+- Stock vendor keeps T1101 camera tunings (vendor/lib64) + odm-subdir identity props.
+- Risk noted: stock vendor is VNDK 31 (A12) + composer 2.1 under an SDK-36
+  system — Treble-forward-compat will be proven (or disproven) by first boot logs.
+
 ## Notes for the port
 
 - Same platform both sides (`MT6789`, MOLY LR13 base) — good sign.

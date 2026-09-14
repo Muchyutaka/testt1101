@@ -1,15 +1,14 @@
-# Canonical T1101 prop overrides for donor (T1103) build.props.
-# Applied by scripts/06-patch-props.sh. Keep in sync with BoardConfig.mk fingerprint.
-ro.product.device=T1101
-ro.build.product=T1101
-ro.product.name=T1101
-ro.product.model=Tecno MegaPad 11
-ro.product.brand=TECNO
-ro.product.manufacturer=tecno
-ro.build.fingerprint=TECNO/TSSI/T1101:14/UP1A.231005.007/260410V1046:user/release-keys
-ro.system.build.fingerprint=TECNO/TSSI/T1101:14/UP1A.231005.007/260410V1046:user/release-keys
-ro.build.description=sys_tssi_64_armv82_tecno_dolby-user 14 UP1A.231005.007 987287 release-keys
-# ro.sf.lcd_density: do NOT hardcode here — copy the measured T1101 value
-# (diff dumps/t1101 vs dumps/t1103 first; 06-patch-props.sh injects it).
-# NEVER copy donor values for: vendor.display.*, ro.surface_flinger.*, persist.sys.sf.*,
-# vendor.mtk.*, ro.vendor.mtk_*, ro.hardware.*, ro.crypto.*, keymaster_ver.
+# Canonical prop overrides for donor (T1103) trees — v2.
+# Donor system-side is GENERIC MSSI (no T1103 strings; T1103-ness lived in odm,
+# which the port skips). Stock system is generic too, so identity/fingerprints
+# are LEFT generic-on-purpose. Only T1101 specifics get forced:
+#   every taken build.prop:  ro.sf.lcd_density=280
+#   product/etc/build.prop:  ro.build.characteristics=tablet, ro.product.type=tablet
+# (Applied by scripts/06-patch-props.sh. Fingerprint/GMS tuning is post-boot.)
+ro.sf.lcd_density=280
+ro.build.characteristics=tablet
+ro.product.type=tablet
+# NEVER copy donor values for: vendor.display.*, ro.surface_flinger.*,
+# persist.sys.sf.*, vendor.mtk.*, ro.vendor.mtk_*, ro.hardware.*, ro.crypto.*.
+# Stock T1101 reference: vendor/build.prop (T1101-OP section) has density 280;
+# product/etc/build.prop has characteristics=tablet + TECNO-T1101 identity.

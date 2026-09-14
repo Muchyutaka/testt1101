@@ -25,8 +25,9 @@ for sub in etc/vconfig etc/vintf etc/init bin firmware; do
   echo "--- odm/$sub"; ls "$D/$sub" 2>/dev/null | head -30 || echo "(missing)"
 done
 echo "--- odm/etc/selinux"; ls "$D/etc/selinux" 2>/dev/null | head -10 || echo "(missing)"
-echo "--- odm/etc/permissions (count + names)"; ls "$D/etc/permissions" 2>/dev/null | tee /dev/stderr | wc -l || echo "(missing)"
-echo "--- odm lib64 .so (count + sample)"; find "$D/lib64" "$D/lib" -maxdepth 1 -name '*.so' 2>/dev/null | tee /dev/stderr | wc -l; find "$D/lib64" "$D/lib" -maxdepth 1 -name '*.so' 2>/dev/null | head -40
+echo "--- odm/etc/permissions (count + names)"; ls "$D/etc/permissions" 2>/dev/null | head -30; echo "count: $(ls "$D/etc/permissions" 2>/dev/null | wc -l)"
+echo "--- odm lib64 .so count:"; find "$D/lib64" "$D/lib" -maxdepth 1 -name '*.so' 2>/dev/null | wc -l
+echo "--- odm lib64 .so sample:"; find "$D/lib64" "$D/lib" -maxdepth 1 -name '*.so' 2>/dev/null | head -40
 echo "--- donor tr_product apps"; ls "$TREES/donor-tr_product/app" "$TREES/donor-tr_product/priv-app" 2>/dev/null || echo "(missing)"
 echo "--- donor system_dlkm content"; find "$TREES/donor-system_dlkm" -maxdepth 3 | head -20
 echo; echo "===== D. /odm + /system_dlkm + new-tr references (donor system-side) ====="
