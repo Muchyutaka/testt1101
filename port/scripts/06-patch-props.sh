@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-# 06-patch-props.sh TREE TAG — v4 (final patch list from prop recon 2026-09-14):
-#  - all donor trees: ro.sf.lcd_density=280 (in place)
-#  - donor product: ro.build.characteristics=tablet (in place),
-#    ro.product.type=tablet + ro.build.display.id=T1101-...V1133 (appended,
-#    Transsion keys present in stock product, absent in donor)
+# 06-patch-props.sh TREE TAG — v5: density in place (all); donor product gets
+# tablet characteristics/type/display.id; donor tr_product gets T1101 identity
+# + ro.tran.tr_product flags (stock parity; donor is generic mssi).
 # Backups live OUTSIDE trees ($BASE/work/prop-orig) so they never get packaged.
 # Usage: bash port/scripts/06-patch-props.sh <tree> <tag>
 set -euo pipefail
@@ -33,5 +31,17 @@ if [[ "$TAG" == "donor-product" ]]; then
   grep -q '^ro\.build\.display\.id=' "$P" || \
     echo 'ro.build.display.id=T1101-M1101ABCD-U-BASE-260410V1133' >> "$P"
   echo "  ro.build.display.id=T1101-...V1133"
+fi
+if [[ "$TAG" == "donor-tr_product" ]]; then
+  sed -i -E 's/^(ro\.product\.tr_product\.brand=).*/\1TECNO/' "$P"
+  sed -i -E 's/^(ro\.product\.tr_product\.device=).*/\1TECNO-T1101/' "$P"
+  sed -i -E 's/^(ro\.product\.tr_product\.manufacturer=).*/\1TECNO/' "$P"
+  sed -i -E 's/^(ro\.product\.tr_product\.model=).*/\1TECNO T1101/' "$P"
+  sed -i -E 's/^(ro\.product\.tr_product\.name=).*/\1T1101-OP/' "$P"
+  echo "  tr_product identity → T1101"
+  grep -q '^ro\.product\.name=' "$P" || echo 'ro.product.name=T1101-OP' >> "$P"
+  grep -q '^ro\.tran\.tr_product\.support=' "$P" || echo 'ro.tran.tr_product.support=1' >> "$P"
+  grep -q '^ro\.tran\.tr_product\.version=' "$P" || echo 'ro.tran.tr_product.version=OP-220417V1' >> "$P"
+  echo "  ro.product.name + ro.tran.tr_product.support/version set"
 fi
 log "done ($TAG)."

@@ -9,6 +9,16 @@ ro.build.characteristics=tablet
 ro.product.type=tablet
 ro.build.display.id=T1101-M1101ABCD-U-BASE-260410V1133
 
+# donor tr_product ONLY (stock identity + feature flags, donor is generic mssi):
+ro.product.tr_product.brand=TECNO
+ro.product.tr_product.device=TECNO-T1101
+ro.product.tr_product.manufacturer=TECNO
+ro.product.tr_product.model=TECNO T1101
+ro.product.tr_product.name=T1101-OP
+ro.product.name=T1101-OP
+ro.tran.tr_product.support=1
+ro.tran.tr_product.version=OP-220417V1
+
 # Deliberately untouched: fingerprints, device/model/brand (vendor pins T1101
 # via source order), ro.build.type=user (same both sides), everything in tr_product
 # except density (tr_product is not in donor property_source_order, so its

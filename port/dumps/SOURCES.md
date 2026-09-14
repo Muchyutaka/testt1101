@@ -174,6 +174,24 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Final batch decided (2026-09-14): transplant Store, delete test camera
+
+- Donor tr_product lacks ALL ro.tran.* + has generic mssi identity → 06 v5 sets
+  T1101 identity + ro.product.name + ro.tran.tr_product.support/version (stock parity).
+- Donor product/tr_product XMLs ALREADY whitelist com.android.vending → baking the
+  Store APK just works, no XML changes. Stock Phonesky found in
+  stock-product/priv-app (apk+oat) → transplant APK (strip stale A14 oat) to OUR
+  product/priv-app (stock parity). Chose Phonesky over Stub-alone (deterministic,
+  no setup-time download dependency); ALSO transplant PlayAutoInstallStub
+  (belt-and-suspenders, tiny) + TrProductOobeOverlayRes.apk (20K, to OUR product/
+  overlay where scanning is guaranteed; safe no-op if signature/target mismatch).
+- Stock operator/ (Drive/Etalase/Videos/WPS, 201MB) SKIPPED: all user-installable
+  from Store post-boot + tr_product/operator scan path uncertain in donor framework.
+- EngineerCamera (245MB factory test app, would crash/show dead icon) DELETED
+  (zero marginal cost inside this rebuild; nothing depends on it).
+- step-finalize-apps.sh does all + rebuilds product & tr_product + verifies
+  (existing MATCH, new files reported, fit rechecked). Then: flash plan.
+
 ## Geometry closed + stock tr_product peek + NO Play Store in donor (2026-09-14)
 
 - Super free (exact): sectors 15813144..18874366 = 3,061,222 sectors =
