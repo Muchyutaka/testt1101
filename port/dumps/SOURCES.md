@@ -174,6 +174,29 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Geometry closed + stock tr_product peek + NO Play Store in donor (2026-09-14)
+
+- Super free (exact): sectors 15813144..18874366 = 3,061,222 sectors =
+  1,567,345,664 bytes (~1494MB) contiguous at tail. Exact-fit confirmed per
+  partition (product/system/ext/vendor/tr_product sizes == imgs ±KB).
+- system_ext_a resize: 1232695296 → 1935958016 (our img 1801740288 + 128MiB
+  margin, sector-aligned). Growth 703MB << 1494MB free; main_a max respected.
+  Order: snapshot-cancel (kill -cow) → resize → flash. Fallback: delete/create.
+- Stock tr_product (816MB): 10 Google apps + Messages + operator/ + overlay/,
+  NO vconfig (donor ADDED vconfig/celluar — harmless, keep), 44-line build.prop
+  with T1101 identity + ro.tran.tr_product.support=1/version=OP-220417V1 +
+  global display.id V1046 (order theory confirmed again).
+- DONOR HAS NO PLAY STORE (no Phonesky/vending in any donor tree). Stock
+  tr_product also lacks it (has PlayAutoInstallStub instead — the downloader!).
+  Next: donor product app list + autoinstall hunt + vending-whitelist grep in
+  donor XMLs + stock Phonesky hunt → then batch ONE rebuild if needed
+  (bake Store or Stub into product/tr_product + ro.tran props if missing +
+  maybe operator/overlay), else straight to flash plan.
+- Stock system_ext HAS TranssionCamera (T1101-tuned) + SmartPanelPad; donor's
+  camera stays for first boot (post-boot APK swap if broken), no build change.
+- Post-boot GMS gap (Gmail/Maps/Photos/YouTube/Messages) solvable via Store
+  (all user-installable); only the Store itself must be in-build (or Stub).
+
 ## Stock lpdump (rooted Android, 2026-09-14): tr_product FITS, resize only system_ext
 
 - Slot _a active; NO _b partitions exist (single-slot usage). Metadata v10.2,
