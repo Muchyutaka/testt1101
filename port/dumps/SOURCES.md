@@ -190,6 +190,10 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Test2 mechanics: combined fc = 2996 lines with /(product|system/product) entries
   present; leftover mounts cleaned; MATCH/DIFF verdict was CUT from paste —
   awaiting `sed -n '/structure diff/,$p' ~/rebuild-test2.txt`.
+- Test2 run 1 DIED on the bare `diff|head` line (diff exits 1 when images differ,
+  errexit+pipefail treated it as fatal) — MATCH/DIFF comparisons never ran. Fixed
+  with `|| true` (both test scripts); re-run also applies 06 v4 (type+display.id)
+  and packs clean (out-of-tree backup). Awaiting re-run tail.
 - Lesson: 06 v3's in-tree `build.prop.orig` got PACKED into the image (+1 inode).
   v4 keeps backups in work/prop-orig/; rebuild-all deletes stray *.orig first.
 

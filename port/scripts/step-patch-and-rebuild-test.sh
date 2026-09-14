@@ -45,7 +45,7 @@ M1="$(mktemp -d)"; M2="$(mktemp -d)"
 sudo mount -o ro,loop "$WORK/product_t1103.img" "$M1"
 sudo mount -o ro,loop "$OUT/product_test.img" "$M2"
 echo "--- structure diff (empty = identical layout):"
-diff <(cd "$M1" && find . | sort) <(cd "$M2" && find . | sort) | head -10; echo "(end structure diff)"
+diff <(cd "$M1" && find . | sort) <(cd "$M2" && find . | sort) | head -10 || true; echo "(end structure diff)"
 lab() { getfattr -n security.selinux --only-values "$1" 2>/dev/null || echo "(none)"; }
 cmp_one() {
   local a b sa sb
