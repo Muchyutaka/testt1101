@@ -17,9 +17,16 @@ log "fstype: $FSTYPE"
 mkdir -p "$OUT"
 case "$FSTYPE" in
   *erofs*|*EROFS*)
-    need dump.erofs
-    log "dump.erofs -x -i $RAW -o $OUT (single-threaded, low RAM)"
-    dump.erofs -x -i "$RAW" -o "$OUT" 2>&1 | tail -5 || fsck.erofs --extract="$OUT" "$RAW" 2>&1 | tail -5
+    # fsck.erofs --extract is the documented path; dump.erofs -x is the fallback.
+    # (pipefail from lib.sh makes sure a failed first attempt reaches the fallback.)
+    if command -v fsck.erofs >/dev/null 2>&1; then
+      fsck.erofs --extract="$OUT" "$RAW" 2>&1 | tail -3 || \
+      dump.erofs -x -i "$RAW" -o "$OUT" 2>&1 | tail -3 || true
+    else
+      need dump.erofs
+      dump.erofs -x -i "$RAW" -o "$OUT" 2>&1 | tail -3 || true
+    fi
+    [[ -n "$(ls -A "$OUT" 2>/dev/null)" ]] || die "extraction produced EMPTY dir — check tool output above"
     ;;
   *ext4*|*ext2*)
     log "ext4: debugfs/mount extract"

@@ -98,10 +98,25 @@ T1101 stock (`super_raw.img`, all content on `_a`, `_b` slots empty, total 5154.
 | product_a | 1864.7MB | odm_dlkm_a | 0.3MB |
 | tr_mi_a | 169.7MB | tr_product/theme/preload/region/company/carrier_a | 0.3MB each |
 
-T1103 donor: `partition_info.json` confirms super size 13335613440 (12.4 GiB),
-groups `main_a/main_b`, extra partitions vs T1101: `odm`, `system_dlkm`,
-`tr_misc`, `tr_manifest`, `tr_overlayfs` (all size-0 in json — real sizes need
-`unsuper --list`, pending). Donor drops T1101's `tr_mi/tr_theme`.
+T1103 donor (`donor-super.raw`, all content on `_a`, `_b` empty, total 5343.2MB):
+
+| part | size | part | size |
+|---|---|---|---|
+| system_a | 922.7MB | vendor_a | 655.3MB |
+| system_ext_a | 1790.9MB | vendor_dlkm_a | 13.6MB |
+| product_a | 434.7MB | odm_a | 791.7MB |
+| system_dlkm_a | 7.7MB | odm_dlkm_a | 4.0MB |
+| tr_product_a | 720.3MB | tr_preload/region/carrier/company/misc/manifest/overlayfs_a | 0.3MB each |
+
+Fit math: stock trio (system+system_ext+product) = 4016.9MB, donor trio =
+3148.3MB → donor SMALLER by ~870MB, fits guaranteed. Even adding donor
+`odm` (791.7MB) + donor `tr_product` (720.3MB, replaces stock 0.3MB placeholder):
+new super ≈ 5.8GB in 9.66GB raw → ~3.8GB spare. No super resize needed.
+OPEN QUESTION (decide from tree survey): donor moved ~1.5GB into `odm` +
+`tr_product` (stock has no `odm`, empty `tr_product`). If HiOS 16 requires
+`/odm` mount/content, port must add `odm_a` + fstab entry; `tr_product` (same
+mount point both sides) can simply take donor content. `system_dlkm` (7.7MB,
+donor GKI modules) skipped — T1101 keeps its 5.10 kernel + vendor_dlkm.
 Gotcha: laptop `/tmp` is 1.9G tmpfs → unsuper sparse staging MUST use
 `--temp-dir` on `/` (scripts now do this automatically).
 
