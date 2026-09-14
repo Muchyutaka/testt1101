@@ -5,13 +5,13 @@ of listing: phone storage (`~/storage/downloads/` in Termux).
 
 ## Stock: Tecno-MegaPad-11-T1101-27 (T1101, Android 14)
 
-Key files present:
-- `super.img` + `super_empty.img` (dynamic partitions live here)
-- `boot.img`, `vendor_boot.img`, `vendor_boot-debug.img`, `vendor_bootss.img`(?) , `dtbo.img`
-- `vbmeta.img`, `vbmeta_system.img`, `vbmeta_vendor.img`
-- Pre-extracted dynamic imgs (saves unpack work): `vendor_dlkm.img`, `odm_dlkm.img`,
-  `tr_mi.img`, `tr_theme.img`, `tr_region.img`, `tr_company.img`, `tr_carrier.img`,
-  `tr_product.img`, `tr_preload.img`
+Key files present (sizes measured 2026-09-14):
+- `super.img` **5.1G** (sparse; expands to ~8.5G raw) + `super_empty.img`
+- `boot.img` 64M, `vendor_boot.img` 64M, `dtbo.img` 8.0M
+- `vbmeta.img` 12K, `vbmeta_system.img` 4K, `vbmeta_vendor.img` 4K
+- Pre-extracted dynamic imgs: `vendor_dlkm.img` 36M, `odm_dlkm.img` 73K,
+  `tr_mi.img` 170M, `tr_theme/region/company/carrier.img` 69K each,
+  `tr_product.img` 21K, `tr_preload.img` 21K (tiny Transsion placeholders — normal)
 - No separate `system.img`/`vendor.img`/`product.img`/`system_ext.img` → inside `super.img`
 - `.map` files (SPFT mappings, not needed), `MT6789_Android_scatter.txt/.xml`
 - `preloader*.img/.bin`, `lk.img`, `lk_a_patched.img` (one dir up), `logo.bin`, `tee.img`, etc.
