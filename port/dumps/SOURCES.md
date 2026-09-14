@@ -174,6 +174,15 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## DSU test detour (2026-09-14): user trials via DSU Sideloader before flashing
+
+- No custom vendor needed (stock vendor stays by design; DSU keeps it automatically).
+- DSU recipe: system+system_ext+product (tr_product unsupported by DSU API; stock
+  one stays mounted — app noise OK), userdata ≤523MB for full set (tight!) else
+  fallbacks (sys+ext+900MB / sys-only+2GB). Cancel snapshots first (3.4GB free).
+  Pending: BOOTCLASSPATH/agares grep (decides full-vs-noproduct recipe).
+- Doc: port/DSU-TEST.md.
+
 ## Finalize run (2026-09-14): ALL GREEN, flash set FINAL 🎉
 
 - 06 v5: 8/8 tr_product lines verified. Phonesky 76MB transplanted (oat
