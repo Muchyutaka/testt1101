@@ -174,6 +174,26 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Stock lpdump (rooted Android, 2026-09-14): tr_product FITS, resize only system_ext
+
+- Slot _a active; NO _b partitions exist (single-slot usage). Metadata v10.2,
+  virtual_ab_device, 3 slots. Super total 9663676416 (9.0GiB).
+- Slot 0 has 13 real partitions: system/system_ext/product/vendor/vendor_dlkm/
+  odm_dlkm/tr_product/tr_mi/tr_theme/tr_preload/tr_region/tr_company/tr_carrier
+  (_a each) + 13 -cow (snapshots ACTIVE → flash plan starts with
+  `fastboot snapshot-update cancel`). NO odm_a, NO system_dlkm_a (consistent:
+  odm=vendor-shim, sys_dlkm inside system.img).
+- STOCK tr_product_a = 855646208 bytes (816MB, verified by dd+pull — the
+  "0.02MB" was my misread of the tiny tr_* SIBLINGS; tr_product was always big
+  on both sides: donor 720MB, stock 816MB). Our 706MB → FITS (spare ~110MB)!
+- REVISED fit: system ✓ (spare 273MB), product ✓ (spare ~1.4GB), tr_product ✓
+  (spare ~110MB); ONLY system_ext overflows (+543MB). Resize ONLY system_ext_a
+  (+~620MB margin). Est. super free ~2.5GB (exact calc from full lpdump).
+- Pulled ~/tr_product_stock_a.img (816MB) — next: peek (apps, build.prop,
+  vconfig vs donor) + Play Store hunt in donor trees + stock camera name.
+- Rollback needs NO super backup: stock system/system_ext/product imgs already
+  in work/ + tr_product_a.img pulled → reflash individually + reverse resize.
+
 ## Rebuild-all run 3 (2026-09-14): ALL 4 BUILT, ALL MATCH, ZERO DIFF 🎉
 
 - system 737337344 FIT(spare 273MB), MATCH=1 (build.prop; no top-level samples
