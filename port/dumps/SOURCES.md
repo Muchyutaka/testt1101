@@ -174,6 +174,20 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
 - Script bug found+fixed: surveys died early on `| head` (SIGPIPE + pipefail + set -e).
   Survey scripts now run with `set +o pipefail`.
 
+## Refs + stamp verdicts (survey-refs complete, 2026-09-14)
+
+- /odm refs in donor system-side: ONLY generic plumbing (ueventd firmware paths,
+  init.rc imports, plat/system_ext file+property contexts). No services, mounts
+  or waits. SKIP odm FINAL.
+- system_dlkm refs: ONLY SELinux mapping CIL. SKIP FINAL.
+- tr_misc/tr_manifest/tr_overlayfs refs: ONE file_contexts line. No wait/mount. SKIP FINAL.
+- Stamp test: extraction LOSES security.selinux xattr + resets uid/gid to the user
+  (orig `u:object_r:system_file:s0 [600 0 0]` vs extracted `(none) [600 1000 1000]`).
+  → Rebuilds MUST re-apply labels via mkfs.erofs --file-contexts + root ownership.
+  step-patch-and-rebuild-test.sh validates the method on donor product (smallest).
+- Stock: camera tunings live in vendor (380 libCamera_*); vendor/odm is a tiny
+  identity+vintf shim. Untouched by the port.
+
 ## Notes for the port
 
 - Same platform both sides (`MT6789`, MOLY LR13 base) — good sign.
