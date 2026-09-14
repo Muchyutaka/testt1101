@@ -149,8 +149,10 @@ Steps:
 ### 2.3 Safe super workflow (step by step, 4 GB-proof)
 
 ```bash
-# 0. deps + swap (once). NOTE: run all blocks under bash — if your shell is
-#    fish (prompt shows `fish:` errors), just type `bash` + Enter first.
+# 0. deps + swap (once). NOTE: run blocks under bash. If your shell is fish,
+#    either type `bash --noprofile --norc` first (plain `bash` may bounce back
+#    to fish if your bashrc auto-switches — verify with `echo $0`), or use the
+#    one-shot step scripts: `bash port/scripts/step-*.sh` works from any shell.
 bash port/scripts/00-deps-debian.sh
 
 # 1. inspect, don't unpack yet (tiny RAM)
