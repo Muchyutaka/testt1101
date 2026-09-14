@@ -185,6 +185,11 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
   (full matched set; eliminates the variable). B/C remain fallbacks.
 - Push: system.img on phone ✓ (adb), system_ext cancelled at 49%, user copied
   via file manager (verify sizes!), product pending. Then snapshot-cancel + install.
+- User (from experience: multi-image vendor zips booted before) insists the set
+  needs vendor.img; single-image test refused (expects bootloop), flash refused
+  (bootloop fear). Provided stock vendor_t1101.img (975450112, unmodified) for
+  their DSU zip. Space: all4+userdata doesn't fit (4333+ > 3413); feasible with
+  vendor: sys+vendor+ud≤1750 / sys+prod+vendor+ud≤1300. Awaiting combo+result.
 - Doc: port/DSU-TEST.md.
 
 ## Finalize run (2026-09-14): ALL GREEN, flash set FINAL 🎉
