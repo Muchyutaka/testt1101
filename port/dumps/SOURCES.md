@@ -120,6 +120,20 @@ donor GKI modules) skipped — T1101 keeps its 5.10 kernel + vendor_dlkm.
 Gotcha: laptop `/tmp` is 1.9G tmpfs → unsuper sparse staging MUST use
 `--temp-dir` on `/` (scripts now do this automatically).
 
+## Donor fstab analysis (T1103 vendor_boot, 2026-09-14)
+
+Donor REQUIRES (no `nofail`): system, system_ext, vendor, product, **odm**,
+vendor_dlkm, odm_dlkm, **system_dlkm**, tr_manifest (at /mnt/vendor/tr_manifest).
+Donor nofail: all other tr_* (region/company/carrier/product/preload/overlayfs/misc).
+Donor tr_* verify against `/odm/etc/vconfig/tran_avb.pubkey` (stock T1101 uses
+`/vendor/etc/tran_avb.pubkey`) — moot, AVB gets disabled.
+Donor metadata tries f2fs first; donor userdata lacks T1101's UFS `sysfs_path`.
+VERDICT: keep the T1101 fstab as boss (ext4 metadata, UFS sysfs_path, stock tr
+set incl. tr_mi/tr_theme). Only open question: add an `odm` entry + partition
+(pending deep survey: does donor system reference /odm? are odm files T1103-HW
+specific?). system_dlkm: skip unless userspace references found. tr_manifest/
+tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed mounts).
+
 ## Notes for the port
 
 - Same platform both sides (`MT6789`, MOLY LR13 base) — good sign.
