@@ -215,14 +215,15 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
   format row, matrix.5 parses 0 HALs (fqname style).
 - DSU track: all4 (system+system_ext+vendor+product) installed with SUCCESS, no
   error; Sideloader showed "reboot". User TAPPED reboot -> INSTANT-STOCK (plain
-  normal reboot, handoff never happened -> NOT a boot crash, install likely
-  hollow). "userdata 32gb" claimed?! (impossible: super total is 9GB ->
-  misunderstanding; clarifying). mkfs flags vanilla (-zlz4hc, no -E) -> EROFS
-  compat likely fine. Awaiting: pstore tail + `gsi_tool status` (asked, not yet
-  pasted) + what "32gb" means. Next-attempt protocol: verify install took
-  (gsi_tool status + /dev/block/mapper/dsu*) BEFORE tapping reboot. Fit: all4
-  ~3.8GB pre-userdata vs ~3.4-4.4GB free -> retry needs drop-vendor (-930MB,
-  zero functional change, it's a copy) or tiny userdata.
+  normal reboot, handoff never happened -> NOT a boot crash, install hollow).
+  ROOT CAUSE FOUND: user typed userdata = 32GB (impossible: super total 9GB,
+  free ~3.4GB) -> gsid could not create it -> hollow "success" -> reboot went
+  to stock because NO trial existed. Pstore stood down (nothing crashed, no
+  crash log to find). Retry recipe: cancel snapshots (free COW space) ->
+  sys+ext+prod WITHOUT vendor (all4=3821MB pre-userdata leaves ~0; vendor is a
+  byte-copy, adds nothing) -> userdata as big as fits (aim >=1GB) -> VERIFY
+  (gsi_tool status + ls /dev/block/mapper | grep dsu) BEFORE tapping reboot.
+  Awaiting: baseline `gsi_tool status` + retry verify outputs + screen report.
 
 ## Final audit requested (2026-09-14): full stock-vs-donor cross-check
 
