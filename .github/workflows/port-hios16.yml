@@ -1,0 +1,112 @@
+name: Port HiOS16 super (T1103→T1101)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "port/manifest.json"
+      - "port/scripts/**"
+      - "port/patches/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq python3 file brotli lz4 zstd unzip zip e2fsprogs erofs-utils gdisk jq simg2img 2>/dev/null || \
+          sudo apt-get install -y -qq python3 file brotli lz4 zstd unzip zip e2fsprogs gdisk jq
+          # lp tools + avbtool: try pip/apt fallbacks
+          pip install --quiet avbtool 2>/dev/null || true
+          sudo apt-get install -y -qq lptools android-sdk-libsparse-utils 2>/dev/null || true
+          which lpdump lpunpack lpmake avbtool simg2img dump.erofs mkfs.erofs || true
+
+      - name: Fetch images from manifest
+        run: |
+          test -f port/manifest.json || { echo "missing port/manifest.json — copy port/manifest.example.json"; exit 1; }
+          mkdir -p work stock donor
+          dl() { # $1=url $2=out $3=sha256
+            echo "GET $1"; curl -L --fail --retry 3 -o "$2" "$1"
+            echo "$3  $2" | sha256sum -c -
+          }
+          for side in stock donor; do
+            url=$(jq -r ".$side.images.super.url" port/manifest.json)
+            sha=$(jq -r ".$side.images.super.sha256" port/manifest.json)
+            nparts=$(jq -r ".$side.images.super.parts | length" port/manifest.json)
+            if [ "$nparts" -gt 0 ]; then
+              for i in $(seq 0 $((nparts-1))); do
+                purl=$(jq -r ".$side.images.super.parts[$i].url" port/manifest.json)
+                psha=$(jq -r ".$side.images.super.parts[$i].sha256" port/manifest.json)
+                dl "$purl" "work/${side}.part$i" "$psha"
+              done
+              cat work/${side}.part* > work/super_${side}.img
+            else
+              dl "$url" "work/super_${side}.img" "$sha"
+            fi
+          done
+          ls -l work/
+
+      - name: Inspect both supers
+        run: |
+          bash port/scripts/01-inspect-super.sh work/super_stock.img | tee inspect-t1101.txt || true
+          bash port/scripts/01-inspect-super.sh work/super_donor.img | tee inspect-t1103.txt || true
+
+      - name: Unpack donor system/system_ext/product + stock vendor set
+        run: |
+          mkdir -p work/parts
+          for p in system system_ext product; do
+            bash port/scripts/02-unpack-one.sh work/super_donor.img "$p" work/parts/
+            mv work/parts/${p}_t1103.img work/parts/${p}_donor_raw.img
+          done
+          for p in vendor vendor_dlkm odm_dlkm tr_mi tr_theme tr_region tr_company tr_carrier tr_product tr_preload; do
+            bash port/scripts/02-unpack-one.sh work/super_stock.img "$p" work/parts/ || echo "SKIP $p (not in super?)"
+          done
+          ls -l work/parts/
+
+      - name: Extract + patch donor trees, rebuild EROFS
+        run: |
+          for p in system system_ext product; do
+            img="work/parts/${p}_donor_raw.img"
+            if head -c 4 "$img" | od -A n -t x1 | grep -q '3a ff 26 ed'; then simg2img "$img" "$img.raw" && mv "$img.raw" "$img"; fi
+            bash port/scripts/03-extract-erofs-lowram.sh "$img" "work/tree_$p"
+            bash port/scripts/06-patch-props.sh "work/tree_$p" port/dumps/t1101 || true
+            mkfs.erofs --workers="$(nproc)" -zlz4 "work/parts/${p}_t1103.img" "work/tree_$p"
+          done
+          # normalize stock names for 05 script
+          for p in vendor vendor_dlkm odm_dlkm tr_mi tr_theme tr_region tr_company tr_carrier tr_product tr_preload; do
+            [ -f "work/parts/${p}_t1101.img" ] || mv "work/parts/${p}_t110"* "work/parts/${p}_t1101.img" 2>/dev/null || true
+          done
+          ls -l work/parts/
+
+      - name: Rebuild ported super
+        run: |
+          mkdir -p out
+          bash port/scripts/05-minimal-port.sh work/parts out/super_ported.img
+          bash port/scripts/01-inspect-super.sh out/super_ported.img | tee out/inspect-ported.txt || true
+
+      - name: Patch vbmetas + flash script
+        run: |
+          bash port/scripts/07-avb-disable.sh port/dumps/t1101/vbmeta.img port/dumps/t1101/vbmeta_system.img port/dumps/t1101/vbmeta_vendor.img out/ || echo "vbmeta patch needs Tier-0 dumps; flash with DNA-Android patched vbmetas instead"
+          cat > out/flash-ported.sh <<'EOF'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          fastboot flash super super_ported.img
+          fastboot --disable-verity --disable-verification flash vbmeta vbmeta_patched.img
+          fastboot --disable-verity --disable-verification flash vbmeta_system vbmeta_system_patched.img
+          fastboot --disable-verity --disable-verification flash vbmeta_vendor vbmeta_vendor_patched.img
+          echo "Now: fastboot -w && fastboot reboot"
+          EOF
+          chmod +x out/flash-ported.sh
+          sha256sum out/* > out/sha256sums.txt || true
+          ls -l out/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hios16-ported-super
+          path: out/*

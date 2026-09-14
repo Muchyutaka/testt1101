@@ -1,2 +1,15 @@
 find.save
 *.bak
+
+# HiOS16 port workdirs (Tier-0 boot-chain files re-included in port/.gitignore)
+work/
+out/
+port/logs/
+*.raw
+*.simg
+super_*.img
+system_*.img
+vendor_*.img
+product_*.img
+*_dlkm*.img
+tr_*.img

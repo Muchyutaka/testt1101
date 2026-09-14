@@ -1,0 +1,9 @@
+# Big images stay in Releases, referenced by manifest.json — never in git.
+dumps/**/*.img
+!dumps/*/boot.img
+!dumps/*/vendor_boot.img
+!dumps/*/dtbo.img
+!dumps/*/vbmeta*.img
+!dumps/*/prebuilt-dtb.img
+work/
+manifest.json

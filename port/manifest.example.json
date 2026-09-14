@@ -1,0 +1,34 @@
+{
+  "_comment": "Copy to port/manifest.json and fill in. CI + 05-minimal-port.sh read this. URLs may be GitHub Release assets or any direct https link. sha256 required. parts[] for split uploads.",
+  "stock": {
+    "device": "T1101",
+    "android": "14",
+    "super_size": 9126805504,
+    "group": "main",
+    "images": {
+      "super":   { "url": "https://github.com/Muchyutaka/testt1101/releases/download/stock/super_t1101.img", "sha256": "PUT-SHA256-HERE", "parts": [] },
+      "boot":         { "path": "port/dumps/t1101/boot.img" },
+      "vendor_boot":  { "path": "port/dumps/t1101/vendor_boot.img" },
+      "dtbo":         { "path": "port/dumps/t1101/dtbo.img" },
+      "vbmeta":        { "path": "port/dumps/t1101/vbmeta.img" },
+      "vbmeta_system": { "path": "port/dumps/t1101/vbmeta_system.img" },
+      "vbmeta_vendor": { "path": "port/dumps/t1101/vbmeta_vendor.img" }
+    }
+  },
+  "donor": {
+    "device": "T1103",
+    "android": "16",
+    "hios": "16",
+    "images": {
+      "super": { "url": "https://github.com/Muchyutaka/testt1101/releases/download/donor/super_t1103.img", "sha256": "PUT-SHA256-HERE", "parts": [] }
+    },
+    "take_partitions": ["system", "system_ext", "product"]
+  },
+  "keep_from_stock": ["vendor", "vendor_dlkm", "odm_dlkm", "tr_mi", "tr_theme", "tr_region", "tr_company", "tr_carrier", "tr_product", "tr_preload"],
+  "output": {
+    "super_size": 9126805504,
+    "group": "main",
+    "slot": "a",
+    "filesystem_note": "system/system_ext/product/vendor=erofs ro, *_dlkm=ext4 ro, tr_* as stock"
+  }
+}
