@@ -214,9 +214,13 @@ tr_misc/tr_overlayfs: skip (0.3MB empty; our fstab won't list them so no failed 
   '-', presence-only rows (drm/health/nn/bt-aidl) misverdict, media.c2 '?'
   format row, matrix.5 parses 0 HALs (fqname style).
 - DSU track: all4 (system+system_ext+vendor+product) installed with SUCCESS, no
-  error; Sideloader showed "reboot". User then UNINSTALLED (to save space) ->
-  boots to stock is EXPECTED (no DSU present), not a failure signal. NO boot
-  verdict yet. Open: was a DSU boot ever attempted? are imgs still on phone?
+  error; Sideloader showed "reboot". User TAPPED reboot -> fell back to stock
+  (attempted, failed). Mechanism proven on this device (user's prior vendor-zip
+  DSUs booted) -> OUR trial system died in early boot. Then uninstalled to save
+  space; imgs still on phone. mkfs flags vanilla (-zlz4hc, no -E) -> EROFS
+  compat likely fine. Suspects: tiny userdata (first-boot ENOSPC?) > early
+  init/mount > framework. Awaiting: pstore tail (BEFORE any new reboot!),
+  screen behavior, userdata size set.
 
 ## Final audit requested (2026-09-14): full stock-vs-donor cross-check
 
